@@ -62,6 +62,7 @@ describe('GroongaHttpClient', () => {
         --drilldowns[tags].table groonga \\
         --drilldowns[tags].keys date`)
 
+      const tz_offset = new Date().getTimezoneOffset() * 60
       expect(r7).toEqual([
         [
           [5],
@@ -71,11 +72,11 @@ describe('GroongaHttpClient', () => {
             ['date', 'Time'],
             ['tag', 'Tags'],
           ],
-          [1, 'Groonga is fast!', 1463626800.0, 'Groonga'],
-          [2, 'Mroonga is fast!', 1463626801.0, 'Mroonga'],
-          [3, 'Groonga sticker!', 1463626802.0, 'Groonga'],
-          [4, 'Groonga site!', 1463626802.0, 'Groonga'],
-          [5, 'Rroonga is fast!', 1463626803.0, 'Rroonga'],
+          [1, 'Groonga is fast!', 1463626800.0 + 32400 + tz_offset, 'Groonga'],
+          [2, 'Mroonga is fast!', 1463626801.0 + 32400 + tz_offset, 'Mroonga'],
+          [3, 'Groonga sticker!', 1463626802.0 + 32400 + tz_offset, 'Groonga'],
+          [4, 'Groonga site!', 1463626802.0 + 32400 + tz_offset, 'Groonga'],
+          [5, 'Rroonga is fast!', 1463626803.0 + 32400 + tz_offset, 'Rroonga'],
         ],
         {
           groonga: [
@@ -85,9 +86,9 @@ describe('GroongaHttpClient', () => {
               ['date', 'Time'],
               ['tag', 'Tags'],
             ],
-            ['Groonga is fast!', 1463626800.0, 'Groonga'],
-            ['Groonga sticker!', 1463626802.0, 'Groonga'],
-            ['Groonga site!', 1463626802.0, 'Groonga'],
+            ['Groonga is fast!', 1463626800.0 + 32400 + tz_offset, 'Groonga'],
+            ['Groonga sticker!', 1463626802.0 + 32400 + tz_offset, 'Groonga'],
+            ['Groonga site!', 1463626802.0 + 32400 + tz_offset, 'Groonga'],
           ],
         },
         {
@@ -97,8 +98,8 @@ describe('GroongaHttpClient', () => {
               ['_key', 'Time'],
               ['_nsubrecs', 'Int32'],
             ],
-            [1463626800.0, 1],
-            [1463626802.0, 2],
+            [1463626800.0 + 32400 + tz_offset, 1],
+            [1463626802.0 + 32400 + tz_offset, 2],
           ],
         },
       ])

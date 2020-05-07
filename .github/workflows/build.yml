@@ -79,7 +79,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-      - run: brew install groonga pkg-config
+      - run: brew install groonga
       - name: node environment
         run: |
           node -v
