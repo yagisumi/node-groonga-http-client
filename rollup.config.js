@@ -8,7 +8,7 @@ export default {
     sourcemap: true,
     sourcemapExcludeSources: true,
   },
-  external: [],
+  external: ['@yagisumi/groonga-command'],
 
   plugins: [
     typescript({
