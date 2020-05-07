@@ -104,6 +104,7 @@ describe('GroongaHttpClient', () => {
       ])
     } catch (err) {
       await shutdownGroonga(server)
+      throw err
     }
   })
 })
