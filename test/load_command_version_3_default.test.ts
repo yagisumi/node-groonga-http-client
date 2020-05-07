@@ -27,19 +27,21 @@ describe('GroongaHttpClient', () => {
     })
     const client = new GroongaHttpClient(axios, server.host)
 
-    const r1 = await client.commandAsync('table_create Memos TABLE_NO_KEY')
-    expect(r1).toBe(true)
+    try {
+      const r1 = await client.commandAsync('table_create Memos TABLE_NO_KEY')
+      expect(r1).toBe(true)
 
-    const r2 = await client.commandAsync('column_create Memos value COLUMN_SCALAR Int8')
-    expect(r2).toBe(true)
+      const r2 = await client.commandAsync('column_create Memos value COLUMN_SCALAR Int8')
+      expect(r2).toBe(true)
 
-    const r3 = await client.commandAsync('load --table Memos --command_version 3', {
-      values: JSON.stringify([{ value: 1 }, { value: 2 }]),
-    })
-    expect(r3).toEqual({
-      n_loaded_records: 2,
-    })
-
-    await shutdownGroonga(server)
+      const r3 = await client.commandAsync('load --table Memos --command_version 3', {
+        values: JSON.stringify([{ value: 1 }, { value: 2 }]),
+      })
+      expect(r3).toEqual({
+        n_loaded_records: 2,
+      })
+    } finally {
+      await shutdownGroonga(server)
+    }
   })
 })

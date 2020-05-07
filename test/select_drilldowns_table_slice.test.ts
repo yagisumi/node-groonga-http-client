@@ -16,7 +16,7 @@ describe('GroongaHttpClient', () => {
       setTimeout(() => {
         rimraf(db_dir)
         resolve()
-      }, 800)
+      }, 1000)
     })
   })
 
@@ -102,9 +102,8 @@ describe('GroongaHttpClient', () => {
           ],
         },
       ])
-    } catch (err) {
+    } finally {
       await shutdownGroonga(server)
-      throw err
     }
   })
 })

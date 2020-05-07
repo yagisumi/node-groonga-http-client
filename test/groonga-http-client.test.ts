@@ -26,9 +26,12 @@ describe('GroongaHttpClient', () => {
       .then((server) => {
         const client = new GroongaHttpClient(axios, server.host)
         client.command('', (err, data) => {
-          expect(err).toBeInstanceOf(Error)
-          expect(data).toBeNull()
-          shutdownGroonga(server, done)
+          try {
+            expect(err).toBeInstanceOf(Error)
+            expect(data).toBeNull()
+          } finally {
+            shutdownGroonga(server, done)
+          }
         })
       })
       .catch((err) => {
@@ -42,9 +45,12 @@ describe('GroongaHttpClient', () => {
       .then((server) => {
         const client = new GroongaHttpClient(axios, server.host)
         client.command('status', (err, data) => {
-          expect(err).toBeUndefined()
-          expect(typeof data).toBe('object')
-          shutdownGroonga(server, done)
+          try {
+            expect(err).toBeUndefined()
+            expect(typeof data).toBe('object')
+          } finally {
+            shutdownGroonga(server, done)
+          }
         })
       })
       .catch((err) => {
@@ -58,9 +64,12 @@ describe('GroongaHttpClient', () => {
       .then((server) => {
         const client = new GroongaHttpClient(axios, server.host)
         client.command('table_create', (err, data) => {
-          expect(err).toBeInstanceOf(GroongaError)
-          expect(data).toBeNull()
-          shutdownGroonga(server, done)
+          try {
+            expect(err).toBeInstanceOf(GroongaError)
+            expect(data).toBeNull()
+          } finally {
+            shutdownGroonga(server, done)
+          }
         })
       })
       .catch((err) => {
@@ -74,9 +83,12 @@ describe('GroongaHttpClient', () => {
       .then((server) => {
         const client = new GroongaHttpClient(axios, server.host)
         client.command('status --output_type msgpack', (err, data) => {
-          expect(err).toBeUndefined()
-          expect(typeof data).toBe('string')
-          shutdownGroonga(server, done)
+          try {
+            expect(err).toBeUndefined()
+            expect(typeof data).toBe('string')
+          } finally {
+            shutdownGroonga(server, done)
+          }
         })
       })
       .catch((err) => {
@@ -91,31 +103,33 @@ describe('GroongaHttpClient', () => {
     })
     const client = createGroongaHttpClient(axios, server.host)
 
-    const r1 = await client
-      .commandAsync('table_create People TABLE_HASH_KEY', { key_type: 'ShortText' })
-      .catch(() => undefined)
-    expect(r1).not.toBeUndefined()
-    expect(r1).toBe(true)
+    try {
+      const r1 = await client
+        .commandAsync('table_create People TABLE_HASH_KEY', { key_type: 'ShortText' })
+        .catch(() => undefined)
+      expect(r1).not.toBeUndefined()
+      expect(r1).toBe(true)
 
-    const r2 = await client.commandAsync('dump').catch(() => undefined)
-    expect(r2).not.toBeUndefined()
-    expect((r2 as string).trim()).toBe('table_create People TABLE_HASH_KEY ShortText')
+      const r2 = await client.commandAsync('dump').catch(() => undefined)
+      expect(r2).not.toBeUndefined()
+      expect((r2 as string).trim()).toBe('table_create People TABLE_HASH_KEY ShortText')
 
-    const r3 = await client
-      .commandAsync('column_create --table People --name age --flags COLUMN_SCALAR --type UInt8')
-      .catch(() => undefined)
-    expect(r3).not.toBeUndefined()
-    expect(r3).toBe(true)
+      const r3 = await client
+        .commandAsync('column_create --table People --name age --flags COLUMN_SCALAR --type UInt8')
+        .catch(() => undefined)
+      expect(r3).not.toBeUndefined()
+      expect(r3).toBe(true)
 
-    const r4 = await client
-      .commandAsync('load --table People', { values: JSON.stringify([{ _key: 'alice', age: 7 }]) })
-      .catch(() => undefined)
-    expect(r4).not.toBeUndefined()
-    expect(r4).toBe(1)
+      const r4 = await client
+        .commandAsync('load --table People', { values: JSON.stringify([{ _key: 'alice', age: 7 }]) })
+        .catch(() => undefined)
+      expect(r4).not.toBeUndefined()
+      expect(r4).toBe(1)
 
-    const r5 = await client.commandAsync('table_create').catch((err) => err)
-    expect(r5).toBeInstanceOf(GroongaError)
-
-    await shutdownGroonga(server)
+      const r5 = await client.commandAsync('table_create').catch((err) => err)
+      expect(r5).toBeInstanceOf(GroongaError)
+    } finally {
+      await shutdownGroonga(server)
+    }
   })
 })

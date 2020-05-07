@@ -5,12 +5,11 @@ on:
 
 jobs:
   build_ubuntu:
-    name: Node.js ${{ matrix.os }} ${{ matrix.node }}
-    runs-on: ${{ matrix.os }}
+    name: Node.js ubuntu ${{ matrix.node }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
         node: [10, 12, 14]
     steps:
       - uses: actions/checkout@v2
@@ -34,12 +33,11 @@ jobs:
         with:
           github-token: ${{ secrets.github_token }}
   build_windows:
-    name: Node.js ${{ matrix.os }} ${{ matrix.node }}
-    runs-on: ${{ matrix.os }}
+    name: Node.js windows ${{ matrix.node }}
+    runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest]
         node: [10, 12, 14]
     steps:
       - uses: actions/checkout@v2
@@ -68,3 +66,27 @@ jobs:
         run: |
           set GROONGA_PATH=%GITHUB_WORKSPACE%\..\groonga
           npm test
+  build_macos:
+    name: Node.js macos ${{ matrix.node }}
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [10, 12, 14]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install Groonga
+        run: |
+          curl --silent --location https://github.com/groonga/groonga/raw/master/data/travis/setup.sh | sh
+          sudo apt-get install -qq -y groonga-normalizer-mysql groonga-tokenizer-mecab
+      - name: node environment
+        run: |
+          node -v
+          npm -v
+      - run: brew install groonga pkg-config
+      - run: npm ci
+      - run: npm test

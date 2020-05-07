@@ -70,7 +70,7 @@ export function spawnGroonga(db_path: string): Promise<Server> {
 
         const groonga_server = child_process.spawn(
           groonga,
-          ['--protocol', 'http', '--port', `${port}`, '-d', '-n', db_path],
+          ['--protocol', 'http', '--port', `${port}`, '-s', '-n', db_path],
           {
             stdio: 'pipe',
           }
