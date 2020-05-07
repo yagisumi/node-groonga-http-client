@@ -14,7 +14,6 @@
   "scripts": {
     "test": "run-s prettier:fix eslint jest",
     "jest": "jest",
-    "doc": "typedoc --json ./docs/typedoc.json --tsconfig ./tsconfig.json ./src",
     "build": "run-s clean build:*",
     "clean": "rimraf lib coverage umd *.tgz .rpt2_cache",
     "build:cjs": "rollup -c -f cjs -o ./lib/groonga-http-client.js",

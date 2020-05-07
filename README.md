@@ -1,9 +1,9 @@
 # @yagisumi/groonga-http-client
 
-Welcome
+HTTP Client for Groonga with axios.
 
 [![NPM version][npm-image]][npm-url] [![install size][packagephobia-image]][packagephobia-url] [![DefinitelyTyped][dts-image]][dts-url]  
-[![Build Status][githubactions-image]][githubactions-url] [![Build Status][travis-image]][travis-url] [![Build Status][appveyor-image]][appveyor-url] [![Coverage percentage][coveralls-image]][coveralls-url]
+[![Build Status][githubactions-image]][githubactions-url] [![Coverage percentage][coveralls-image]][coveralls-url]
 
 ## Installation
 
@@ -13,25 +13,64 @@ $ npm i @yagisumi/groonga-http-client
 
 ## Usage
 
-- javascript
-
-```js
-const { groonga-http-client } = require('@yagisumi/groonga-http-client');
-
-XXXXXXXXX();
-```
-
 - typescript
 
 ```ts
-import { @yagisumi/groonga-http-client } from '@yagisumi/groonga-http-client';
+import { createGroongaHttpClient } from '@yagisumi/groonga-http-client'
+import axios from 'axios'
 
-XXXXXXXXX();
+async function main() {
+  const client = createGroongaHttpClient(axios, 'http://localhost:10041')
+  const r1 = await client.commandAsync('status').catch(() => undefined)
+
+  client.command('table_list', (err, data) => {
+    if (err) {
+      console.error(err)
+    } else {
+      console.log(data)
+    }
+  })
+}
+main()
 ```
 
-## Documentation
+## API
 
-https://yagisumi.github.io/node-groonga-http-client/
+### createGroongaHttpClient
+```ts
+function createGroongaHttpClient(
+  axios: AxiosInstance, 
+  host: string // e.g. 'http://localhost:10041'
+): GroongaHttpClient
+```
+Creats a client. Same as `new GroongaHttpClient(axios, host)`
+
+### class GroongaHttpClient
+#### command
+```ts
+command(
+  command: string,
+  options: object,
+  callback: (err: Error, data: any) => void
+): void
+command(
+  command: string,
+  callback: (err: Error, data: any) => void
+): void
+```
+Executes a command with a callback.
+
+#### commandAsync
+```ts
+commandAsync(
+  command: string,
+  options: object
+): Promise<any>
+commandAsync(
+  command: string
+): Promise<any>
+```
+Executes a command and returns a promise.
 
 ## License
 
