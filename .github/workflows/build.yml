@@ -1,0 +1,67 @@
+name: build
+on:
+  push:
+  pull_request:
+
+jobs:
+  build_ubuntu_mac:
+    name: Node.js ${{ matrix.os }} ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node: [10, 12, 14]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install Groonga
+        run: |
+          curl --silent --location https://github.com/groonga/groonga/raw/master/data/travis/setup.sh | sh
+          sudo apt-get install -qq -y groonga-normalizer-mysql groonga-tokenizer-mecab
+      - name: node environment
+        run: |
+          node -v
+          npm -v
+      - run: npm ci
+      - run: npm test
+      - name: Coveralls
+        if: matrix.os == 'ubuntu-latest' && matrix.node == 14
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+  build_windows:
+    name: Node.js ${{ matrix.os }} ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest]
+        node: [10, 12, 14]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install Groonga
+        run: |
+          set RELEASE_VERSION=10.0.2
+          set VS_VERSION=2019
+          set ARCHIVE=groonga-%RELEASE_VERSION%-x64-vs%VS_VERSION%.zip
+
+          curl -OL https://github.com/groonga/groonga/releases/download/v%RELEASE_VERSION%/%ARCHIVE%
+          7z x %ARCHIVE%
+          del %ARCHIVE%
+          move groonga-* ..\groonga
+      - name: node environment
+        run: |
+          node -v
+          npm -v
+      - run: npm ci
+      - run: |
+          set GROONGA_PATH=%GITHUB_WORKSPACE%\..\groonga
+          npm test
