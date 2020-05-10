@@ -58,7 +58,7 @@ describe('GroongaHttpClient', () => {
       })
   })
 
-  test('command fail', (done) => {
+  test('command failure', (done) => {
     const db_path = path.join(db_dir, 'command_fail.db')
     spawnGroonga(db_path)
       .then((server) => {
