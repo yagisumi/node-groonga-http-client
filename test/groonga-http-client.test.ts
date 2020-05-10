@@ -1,5 +1,6 @@
 import axios from 'axios'
-import { GroongaHttpClient, GroongaError, createGroongaHttpClient } from '@/groonga-http-client'
+import { GroongaHttpClient, createClient } from '@/groonga-http-client'
+import { GroongaError, isArrayBuffer } from '@/client_utils'
 import { spawnGroonga, shutdownGroonga, mkdir, rimraf } from './test_utils'
 import path from 'path'
 
@@ -85,7 +86,8 @@ describe('GroongaHttpClient', () => {
         client.command('status --output_type msgpack', (err, data) => {
           try {
             expect(err).toBeUndefined()
-            expect(typeof data).toBe('string')
+            expect(typeof data).not.toBe('string')
+            expect(isArrayBuffer(data)).toBe(true)
           } finally {
             shutdownGroonga(server, done)
           }
@@ -101,7 +103,7 @@ describe('GroongaHttpClient', () => {
     const server = await spawnGroonga(db_path).catch((err) => {
       throw err
     })
-    const client = createGroongaHttpClient(axios, server.host)
+    const client = createClient(axios, server.host)
 
     try {
       const r1 = await client
