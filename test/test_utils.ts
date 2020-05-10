@@ -68,23 +68,32 @@ export function spawnGroonga(db_path: string): Promise<Server> {
           return
         }
 
-        const groonga_server = child_process.spawn(
-          groonga,
-          ['--protocol', 'http', '--port', `${port}`, '-s', '-n', db_path],
-          {
-            stdio: 'pipe',
-          }
-        )
-
         setTimeout(() => {
-          if (typeof (groonga_server as any).exitCode === 'number') {
-            reject(new Error(`groonga error: ${(groonga_server as any).exitCode}`))
-          } else {
-            resolve({
-              process: groonga_server,
-              host: `http://localhost:${port}/`,
-            })
-          }
+          const groonga_server = child_process.spawn(
+            groonga,
+            ['--protocol', 'http', '--port', `${port}`, '-s', '-n', db_path],
+            {
+              stdio: 'pipe',
+            }
+          )
+
+          let error: Error | undefined = undefined
+          groonga_server.on('error', (err) => {
+            error = err
+          })
+
+          setTimeout(() => {
+            if (error) {
+              reject(error)
+            } else if (typeof (groonga_server as any).exitCode === 'number') {
+              reject(new Error(`groonga error: ${(groonga_server as any).exitCode}`))
+            } else {
+              resolve({
+                process: groonga_server,
+                host: `http://localhost:${port}/`,
+              })
+            }
+          }, 500)
         }, 500)
       })
     })
