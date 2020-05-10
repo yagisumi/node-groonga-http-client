@@ -4,6 +4,8 @@ import { GroongaError, isArrayBuffer } from '@/client_utils'
 import { spawnGroonga, shutdownGroonga, mkdir, rimraf } from './test_utils'
 import path from 'path'
 
+jest.setTimeout(30000)
+
 describe('GroongaHttpClient', () => {
   const db_dir = path.join(__dirname, 'db_main')
 
