@@ -1,65 +1,6 @@
-import type { AxiosInstance, AxiosResponse } from 'axios'
+import type { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios'
 import { parseCommand, TypeGuards } from '@yagisumi/groonga-command'
-
-function chomp(str: string, rs: string) {
-  return str.endsWith(rs) ? str.slice(0, -rs.length) : str
-}
-
-type OK = { error: undefined; data: any }
-type ERR = { error: Error; data: null }
-type Result = OK | ERR
-
-function ERR(error: Error): ERR {
-  return { error, data: null }
-}
-
-function OK(data: any): OK {
-  return { error: undefined, data }
-}
-
-export class GroongaError extends Error {
-  readonly data: any
-  constructor(message: string, data: any) {
-    super(message)
-    this.data = data
-  }
-}
-
-function checkOutput(data: any): Result {
-  const data_type = typeof data
-  if (data_type === 'string') {
-    return OK(data)
-  }
-
-  let header: any = undefined
-  let body: any = undefined
-  let return_code: any = undefined
-  let error_message: string | undefined = undefined
-
-  if (Array.isArray(data)) {
-    header = data[0]
-    body = data[1]
-    if (Array.isArray(header)) {
-      return_code = header[0]
-      error_message = header[3]
-    }
-  } else if (typeof data === 'object') {
-    header = data.header
-    body = data.body
-    return_code = header?.return_code
-    error_message = header?.error?.message
-  }
-
-  if (header === undefined || body === undefined || return_code === undefined) {
-    return ERR(new GroongaError('unexpected data type', data))
-  }
-
-  if (return_code === 0) {
-    return OK(body)
-  }
-
-  return ERR(new GroongaError(error_message ?? 'unexpected error', data))
-}
+import { getResponseBody, chomp } from './client_utils'
 
 export type CommandCallback = (err: Error | undefined, data: any) => void
 
@@ -99,21 +40,29 @@ export class GroongaHttpClient {
           cb(new Error('unexpected type of values'), null)
         }
       }
-      response = this.axios.post(url, values, { headers: { 'Content-Type': 'application/json' } })
+      const config: AxiosRequestConfig = { headers: { 'Content-Type': 'application/json' } }
+      if (cmd.output_type === 'msgpack') {
+        config.responseType = 'arraybuffer'
+      }
+      response = this.axios.post(url, values, config)
     } else {
       const url = chomp(this.host, '/') + cmd.to_uri_format()
-      response = this.axios.get(url)
+      const config: AxiosRequestConfig = {}
+      if (cmd.output_type === 'msgpack') {
+        config.responseType = 'arraybuffer'
+      }
+      response = this.axios.get(url, config)
     }
 
     response
       .then((res) => {
-        const { error, data } = checkOutput(res.data)
-        cb(error, data)
+        const { error, value } = getResponseBody(res.data)
+        cb(error, value)
       })
       .catch((err) => {
-        if (err.response) {
-          const { error, data } = checkOutput(err.response.data)
-          cb(error, data)
+        if (err?.response?.data) {
+          const { error, value } = getResponseBody(err.response.data)
+          cb(error, value)
         } else {
           cb(err, null)
         }
@@ -135,6 +84,9 @@ export class GroongaHttpClient {
   }
 }
 
-export function createGroongaHttpClient(axios: AxiosInstance, host: string) {
+export function createClient(axios: AxiosInstance, host: string) {
   return new GroongaHttpClient(axios, host)
 }
+
+export type GroongaHttpClientClass = typeof GroongaHttpClient
+export type GroongaHttpClientInstance = GroongaHttpClient
