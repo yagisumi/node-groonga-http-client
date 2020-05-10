@@ -3,8 +3,6 @@ import { GroongaHttpClient } from '@/groonga-http-client'
 import { spawnGroonga, shutdownGroonga, mkdir, rimraf } from './test_utils'
 import path from 'path'
 
-jest.setTimeout(30000)
-
 describe('GroongaHttpClient', () => {
   const db_dir = path.join(__dirname, 'db_load')
 
