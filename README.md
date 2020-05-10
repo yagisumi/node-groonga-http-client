@@ -16,11 +16,11 @@ $ npm i @yagisumi/groonga-http-client
 - typescript
 
 ```ts
-import { createGroongaHttpClient } from '@yagisumi/groonga-http-client'
+import { createClient } from '@yagisumi/groonga-http-client'
 import axios from 'axios'
 
 async function main() {
-  const client = createGroongaHttpClient(axios, 'http://localhost:10041')
+  const client = createClient(axios, 'http://localhost:10041')
   const r1 = await client.commandAsync('status').catch(() => undefined)
 
   client.command('table_list', (err, data) => {
@@ -36,9 +36,9 @@ main()
 
 ## API
 
-### createGroongaHttpClient
+### createClient
 ```ts
-function createGroongaHttpClient(
+function createClient(
   axios: AxiosInstance, 
   host: string // e.g. 'http://localhost:10041'
 ): GroongaHttpClient
