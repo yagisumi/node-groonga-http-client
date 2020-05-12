@@ -3,6 +3,7 @@ import path from 'path'
 import net from 'net'
 import child_process from 'child_process'
 import axios from 'axios'
+import getPort from 'get-port'
 
 export function mkdir(path: string) {
   fs.mkdirSync(path)
@@ -29,74 +30,57 @@ type Server = {
 
 export function spawnGroonga(db_path: string): Promise<Server> {
   return new Promise((resolve, reject) => {
-    let port = 0
-    const s = net.createServer()
-    const iid_s = setTimeout(() => {
-      if (s.listening) {
-        s.close()
-      }
-      reject(new Error('unexpected error'))
-    }, 3000)
-
     let groonga = 'groonga'
     if (process.platform === 'win32') {
       const env_path = process.env.GROONGA_PATH
       if (env_path == null) {
-        clearTimeout(iid_s)
         reject(new Error("missing environment variable 'GROONGA_PATH'"))
         return
       }
 
       groonga = path.join(env_path, 'bin/groonga.exe')
       if (!fs.existsSync(groonga)) {
-        clearTimeout(iid_s)
         reject(new Error(`missing groonga.exe: ${groonga}`))
         return
       }
     }
 
-    s.listen({ host: 'localhost', port: 0 }, () => {
-      const address = s.address()
-      if (address != null && typeof address !== 'string') {
-        port = address.port
-      }
+    getPort()
+      .then((port) => {
+        const groonga_server = child_process.spawn(
+          groonga,
+          ['--protocol', 'http', '--port', `${port}`, '-s', '-n', db_path],
+          {
+            stdio: 'pipe',
+          }
+        )
 
-      s.close(() => {
-        clearTimeout(iid_s)
-        if (port === 0) {
-          reject(new Error('faild to get port number'))
-          return
-        }
+        let error: Error | undefined = undefined
+        groonga_server.on('error', (err) => {
+          error = err
+        })
+        groonga_server.on('exit', (code) => {
+          if (typeof code === 'number' && code !== 0) {
+            error = new Error(`exit code: ${code}`)
+          }
+        })
 
         setTimeout(() => {
-          const groonga_server = child_process.spawn(
-            groonga,
-            ['--protocol', 'http', '--port', `${port}`, '-s', '-n', db_path],
-            {
-              stdio: 'pipe',
-            }
-          )
-
-          let error: Error | undefined = undefined
-          groonga_server.on('error', (err) => {
-            error = err
-          })
-
-          setTimeout(() => {
-            if (error) {
-              reject(error)
-            } else if (typeof (groonga_server as any).exitCode === 'number') {
-              reject(new Error(`groonga error: ${(groonga_server as any).exitCode}`))
-            } else {
-              resolve({
-                process: groonga_server,
-                host: `http://localhost:${port}/`,
-              })
-            }
-          }, 500)
+          if (error) {
+            reject(error)
+          } else if (typeof (groonga_server as any).exitCode === 'number') {
+            reject(new Error(`exit code: ${(groonga_server as any).exitCode}`))
+          } else {
+            resolve({
+              process: groonga_server,
+              host: `http://localhost:${port}/`,
+            })
+          }
         }, 500)
       })
-    })
+      .catch((err) => {
+        reject(err)
+      })
   })
 }
 
