@@ -6,5 +6,3 @@ node_modules/
 /lib/
 /src/*.js
 /src/*.map
-/src/test/*.map
-/src/test/*.d.ts
