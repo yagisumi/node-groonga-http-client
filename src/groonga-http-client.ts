@@ -12,9 +12,9 @@ export class GroongaHttpClient {
     this.host = host
   }
 
-  command(command: string, options: object, callback: CommandCallback): void
+  command(command: string, options: Record<string, unknown>, callback: CommandCallback): void
   command(command: string, callback: CommandCallback): void
-  command(command: string, arg2: object | CommandCallback, callback?: CommandCallback): void {
+  command(command: string, arg2: Record<string, unknown> | CommandCallback, callback?: CommandCallback): void {
     const opts = typeof arg2 === 'object' ? arg2 : undefined
     const cb = typeof arg2 === 'function' ? (arg2 as CommandCallback) : callback
 
@@ -69,9 +69,9 @@ export class GroongaHttpClient {
       })
   }
 
-  commandAsync(command: string, options: object): Promise<any>
+  commandAsync(command: string, options: Record<string, unknown>): Promise<any>
   commandAsync(command: string): Promise<any>
-  commandAsync(command: string, options?: object): Promise<any> {
+  commandAsync(command: string, options?: Record<string, unknown>): Promise<any> {
     return new Promise((resolve, reject) => {
       this.command(command, options || {}, (err, data) => {
         if (err) {
