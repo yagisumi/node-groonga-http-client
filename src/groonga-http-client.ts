@@ -103,5 +103,9 @@ export function createClient(axios: AxiosLike, host: string) {
   return new GroongaHttpClient(axios, host)
 }
 
+export function createGroongaClient(axios: AxiosLike, host: string) {
+  return new GroongaHttpClient(axios, host)
+}
+
 export type GroongaHttpClientClass = typeof GroongaHttpClient
 export type GroongaHttpClientInstance = GroongaHttpClient
