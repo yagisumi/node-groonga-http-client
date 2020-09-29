@@ -22,9 +22,10 @@ export function rimraf(dir_path: string) {
   }
 }
 
-type Server = {
+export type Server = {
   process: child_process.ChildProcessWithoutNullStreams
   host: string
+  db_dir: string
 }
 
 export function spawnGroonga(db_path: string): Promise<Server> {
@@ -73,6 +74,7 @@ export function spawnGroonga(db_path: string): Promise<Server> {
             resolve({
               process: groonga_server,
               host: `http://localhost:${port}/`,
+              db_dir: path.dirname(db_path),
             })
           }
         }, 500)
@@ -83,23 +85,22 @@ export function spawnGroonga(db_path: string): Promise<Server> {
   })
 }
 
-function postprocess(server: Server, done: () => void) {
-  return function () {
-    server.process.kill()
-    if (done) {
-      done()
-    }
-  }
+export function sleep(msec: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, msec))
 }
 
-export function shutdownGroonga(server: Server, done?: () => any) {
-  if (done) {
-    const pp = postprocess(server, done)
-    axios.get(`${server.host}/d/shutdown`).then(pp).catch(pp)
-  } else {
-    return new Promise((resolve) => {
-      const pp = postprocess(server, resolve)
-      axios.get(`${server.host}/d/shutdown`).then(pp).catch(pp)
-    })
+export async function shutdownGroonga(server: Server) {
+  await axios.get(`${server.host}d/shutdown`).catch(() => 0)
+  await sleep(300)
+  for (let i = 0; i < 10; i++) {
+    try {
+      server.process.kill()
+      await sleep(300)
+      if (server.process.exitCode != null || server.process.killed) {
+        break
+      }
+    } catch (e) {
+      // empty
+    }
   }
 }
