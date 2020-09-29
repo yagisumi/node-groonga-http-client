@@ -1,13 +1,28 @@
-import type { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios'
 import { parseCommand, TypeGuards } from '@yagisumi/groonga-command'
 import { getResponseBody, chomp } from './client_utils'
 
 export type CommandCallback = (err: Error | undefined, data: any) => void
 
+export type ResponseType = 'arraybuffer' | 'json'
+
+export interface AxiosRequestConfigLike {
+  headers?: Record<string, string>
+  responseType?: ResponseType
+}
+
+interface AxiosResponseLike<T = any> {
+  data: T
+}
+
+export interface AxiosLike {
+  get<T = any, R = AxiosResponseLike<T>>(url: string, config?: AxiosRequestConfigLike): Promise<R>
+  post<T = any, R = AxiosResponseLike<T>>(url: string, data?: any, config?: AxiosRequestConfigLike): Promise<R>
+}
+
 export class GroongaHttpClient {
-  readonly axios: AxiosInstance
+  readonly axios: AxiosLike
   readonly host: string
-  constructor(axios: AxiosInstance, host: string) {
+  constructor(axios: AxiosLike, host: string) {
     this.axios = axios
     this.host = host
   }
@@ -28,7 +43,7 @@ export class GroongaHttpClient {
       return
     }
 
-    let response: Promise<AxiosResponse<any>>
+    let response: Promise<AxiosResponseLike<any>>
 
     if (TypeGuards.isLoad(cmd)) {
       const url = chomp(this.host, '/') + cmd.to_uri_format({ exclude: ['values'] })
@@ -40,14 +55,14 @@ export class GroongaHttpClient {
           cb(new Error('unexpected type of values'), null)
         }
       }
-      const config: AxiosRequestConfig = { headers: { 'Content-Type': 'application/json' } }
+      const config: AxiosRequestConfigLike = { headers: { 'Content-Type': 'application/json' } }
       if (cmd.output_type === 'msgpack') {
         config.responseType = 'arraybuffer'
       }
       response = this.axios.post(url, values, config)
     } else {
       const url = chomp(this.host, '/') + cmd.to_uri_format()
-      const config: AxiosRequestConfig = {}
+      const config: AxiosRequestConfigLike = {}
       if (cmd.output_type === 'msgpack') {
         config.responseType = 'arraybuffer'
       }
@@ -84,7 +99,7 @@ export class GroongaHttpClient {
   }
 }
 
-export function createClient(axios: AxiosInstance, host: string) {
+export function createClient(axios: AxiosLike, host: string) {
   return new GroongaHttpClient(axios, host)
 }
 
