@@ -47,13 +47,15 @@ export function getResponseBody(response: any): Result {
       error_message = header[3]
     }
   } else if (typeof response === 'object') {
-    header = response.header
-    body = response.body
-    return_code = header?.return_code
-    error_message = header?.error?.message
+    if (response != null) {
+      header = response.header
+      body = response.body
+      return_code = header?.return_code
+      error_message = header?.error?.message
+    }
   }
 
-  if (header === undefined || body === undefined || return_code === undefined) {
+  if (header === undefined || return_code === undefined) {
     return ERR(new GroongaError('unexpected data type', response, return_code))
   }
 
