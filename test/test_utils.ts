@@ -92,7 +92,7 @@ function postprocess(server: Server, done: () => void) {
   }
 }
 
-export function shutdownGroonga(server: Server, done?: jest.DoneCallback) {
+export function shutdownGroonga(server: Server, done?: () => any) {
   if (done) {
     const pp = postprocess(server, done)
     axios.get(`${server.host}/d/shutdown`).then(pp).catch(pp)
