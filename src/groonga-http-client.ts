@@ -1,5 +1,6 @@
 import { parseCommand, TypeGuards } from '@yagisumi/groonga-command'
 import { getResponseBody, chomp } from './client_utils'
+export { GroongaError } from './client_utils'
 
 export type CommandCallback = (err: Error | undefined, data: any) => void
 
