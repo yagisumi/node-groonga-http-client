@@ -1,4 +1,5 @@
 /coverage
 /lib
+/umd
 tsconfig.json
 tsconfig.*.json
