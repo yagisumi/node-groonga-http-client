@@ -1,8 +1,10 @@
 {
   "name": "@yagisumi/groonga-http-client",
   "version": "0.1.0",
-  "description": "",
-  "keywords": [],
+  "description": "groonga http client with axios",
+  "keywords": [
+    "groonga"
+  ],
   "engines": {
     "node": ">= 10"
   },
@@ -14,7 +16,7 @@
   "scripts": {
     "test": "run-s prettier:fix eslint mocha:coverage",
     "jest": "jest",
-    "mocha": "cross-env TS_NODE_FILES=true TS_NODE_PROJECT=tsconfig.mocha.json mocha --config mocharc.json \"test/**/*.test.ts\"",
+    "mocha": "cross-env TS_NODE_FILES=true TS_NODE_PROJECT=tsconfig.mocha.json mocha \"test/**/*.test.ts\"",
     "mocha:coverage": "nyc npm run mocha -- --no-parallel",
     "build": "run-s clean build:*",
     "clean": "rimraf lib coverage umd *.tgz .rpt2_cache .nyc_output",
@@ -52,7 +54,6 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.27.3",
-    "source-map-support": "^0.5.19",
     "ts-jest": "^26.4.1",
     "ts-node": "^9.0.0",
     "tsconfig-paths": "^3.9.0",
