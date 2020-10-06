@@ -17,7 +17,11 @@ interface AxiosResponseLike<T = any> {
 
 export interface AxiosLike {
   get<T = any, R = AxiosResponseLike<T>>(url: string, config?: AxiosRequestConfigLike): Promise<R>
-  post<T = any, R = AxiosResponseLike<T>>(url: string, data?: any, config?: AxiosRequestConfigLike): Promise<R>
+  post<T = any, R = AxiosResponseLike<T>>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfigLike
+  ): Promise<R>
 }
 
 export class GroongaHttpClient {
@@ -30,7 +34,11 @@ export class GroongaHttpClient {
 
   command(command: string, options: Record<string, unknown>, callback: CommandCallback): void
   command(command: string, callback: CommandCallback): void
-  command(command: string, arg2: Record<string, unknown> | CommandCallback, callback?: CommandCallback): void {
+  command(
+    command: string,
+    arg2: Record<string, unknown> | CommandCallback,
+    callback?: CommandCallback
+  ): void {
     const opts = typeof arg2 === 'object' ? arg2 : undefined
     const cb = typeof arg2 === 'function' ? (arg2 as CommandCallback) : callback
 

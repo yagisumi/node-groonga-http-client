@@ -97,7 +97,7 @@ describe('client utils', () => {
         error: {
           message: "[column][create] table doesn't exist: <Memos>",
           function: 'command_column_create',
-          file: 'G:\\data\\workspace\\script\\groonga\\src\\groonga-10.0.2\\lib\\proc\\proc_column.c',
+          file: 'D:\\data\\groonga\\src\\groonga-10.0.2\\lib\\proc\\proc_column.c',
           line: 198,
         },
       },
