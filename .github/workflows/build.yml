@@ -61,7 +61,7 @@ jobs:
           set ARCHIVE=groonga-%RELEASE_VERSION%-x64-vs%VS_VERSION%.zip
 
           curl -OL http://packages.groonga.org/windows/groonga/%ARCHIVE%
-          7z x %ARCHIVE%
+          7z x %ARCHIVE% -o*
           del %ARCHIVE%
           move groonga-* ..\groonga
       - name: node environment
