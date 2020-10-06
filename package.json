@@ -14,7 +14,7 @@
   "types": "lib/groonga-http-client.d.ts",
   "unpkg": "umd/groonga-http-client.js",
   "scripts": {
-    "test": "run-s prettier:fix eslint mocha:coverage",
+    "test": "run-s prettier:check eslint mocha:coverage",
     "jest": "jest",
     "mocha": "cross-env TS_NODE_FILES=true TS_NODE_PROJECT=tsconfig.mocha.json mocha \"test/**/*.test.ts\"",
     "mocha:coverage": "nyc npm run mocha -- --no-parallel",
@@ -24,8 +24,9 @@
     "build:mjs": "rollup -c -f es -o ./lib/groonga-http-client.mjs",
     "build:umd": "rollup -c rollup.config.umd.js",
     "build:d_ts": "tsc -p src -d --emitDeclarationOnly --outDir ./lib",
-    "prettier:fix": "prettier --write \"**/*.{ts,js,json}\"",
-    "eslint": "eslint \"**/*.{js,ts}\"",
+    "prettier:check": "prettier --check \"{src,test}/**/*.{ts,js,json}\"",
+    "prettier:fix": "prettier --write \"{src,test}/**/*.{ts,js,json}\"",
+    "eslint": "eslint \"{src,test}/**/*.{js,ts}\"",
     "prepack": "run-s build test"
   },
   "author": "yagisumi",
@@ -41,6 +42,7 @@
     "coveralls": "^3.1.0",
     "cross-env": "^7.0.2",
     "eslint": "^7.10.0",
+    "eslint-config-prettier": "^6.12.0",
     "get-port": "^5.1.1",
     "jest": "^26.4.2",
     "mocha": "^8.1.3",
