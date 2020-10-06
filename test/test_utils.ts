@@ -4,8 +4,8 @@ import child_process from 'child_process'
 import axios from 'axios'
 import getPort from 'get-port'
 
-export function mkdir(path: string) {
-  fs.mkdirSync(path)
+export function mkdir(dir: string) {
+  fs.mkdirSync(dir)
 }
 
 export function rimraf(dir_path: string) {

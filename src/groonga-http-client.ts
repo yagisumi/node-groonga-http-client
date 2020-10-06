@@ -76,7 +76,7 @@ export class GroongaHttpClient {
         cb(error, value)
       })
       .catch((err) => {
-        if (err?.response?.data) {
+        if (err?.response?.data != null) {
           const { error, value } = getResponseBody(err.response.data)
           cb(error, value)
         } else {
